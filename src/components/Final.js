@@ -23,12 +23,12 @@ function Final({ updateRecord, goodanswer, nbrQuestions, time, id, handleAnwser 
             "time": time,
             "user": user,
             "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0",
-            "quiz": `http://dcpepper.pythonanywhere.com/quiz/${id}/`,
+            "quiz": `https://${process.env.REACT_APP_API_DNS}/quiz/${id}/`,
             "points": goodanswer
 
         };
         if (user !== "") {
-            axios.post('http://dcpepper.pythonanywhere.com/record/', data)
+            axios.post(`https://${process.env.REACT_APP_API_DNS}/record/`, data)
         }
         setSent(true);
         updateRecord(data)
@@ -58,8 +58,8 @@ function Final({ updateRecord, goodanswer, nbrQuestions, time, id, handleAnwser 
 
         <div className='d-flex justify-content-center'>RESULTAT:</div>
         <div className='d-flex m-2 justify-content-around'>
-        <div>{goodanswer + "/" + nbrQuestions}</div>
-        {time ? <div className='ml-3'>{convertTime(time)}</div> : "Wait"}
+            <div>{goodanswer + "/" + nbrQuestions}</div>
+            {time ? <div className='ml-3'>{convertTime(time)}</div> : "Wait"}
         </div>
         {!send ? <button type='button' className='btn btn-secondary' onClick={setUp}>Enregistrer le résultat</button> : !sent ? <div>
             <input name='username' onChange={handleChange}></input> <button type='button' className='btn btn-secondary' onClick={() => handleRecord(user)}>OK</button>

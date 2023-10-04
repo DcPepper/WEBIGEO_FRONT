@@ -14,19 +14,19 @@ function Menu2() {
     var [types, setTypes] = useState("");
     useEffect(() => {
         axios
-            .get('http://dcpepper.pythonanywhere.com/country/')
+            .get(`https://${process.env.REACT_APP_API_DNS || "api.webigeo-pre.dcpepper.cloudns.ph"}/country/`)
             .then(res => {
                 setCountries(res.data)
             })
         axios
-            .get('http://dcpepper.pythonanywhere.com/quiz/')
+            .get(`https://${process.env.REACT_APP_API_DNS}/quiz/`)
             .then(res => {
                 setQuiz(res.data)
             })
     }, [])
     let navigator = useNavigate();
 
-   
+
 
     const quizChoice = (q) => {
         let path = `../quiz/${q.pk}`;
@@ -40,38 +40,40 @@ function Menu2() {
 
 
     var contientDict = {
-        "all":"monde",
-        "europe":"europe",
-        "asia":"asie",
-        "oceania":"oceanie",
-        "namerica":"Amérique du nord",
-        "samerica":"amérique du sud",
-        "africa":"afrique"
+        "all": "monde",
+        "europe": "europe",
+        "asia": "asie",
+        "oceania": "oceanie",
+        "namerica": "Amérique du nord",
+        "samerica": "amérique du sud",
+        "africa": "afrique"
     }
 
     var typeDict = {
-        "FLAG":"DRAPEAU",
+        "FLAG": "DRAPEAU",
         "ALL": "MIXTE",
-        "CAPITALE":"CAPITALE",
-        "SHAPE":"FORME"
+        "CAPITALE": "CAPITALE",
+        "SHAPE": "FORME"
     }
 
     const handleType = (ev) => {
         setTypes(Object.entries(typeDict).filter(item => item[1] === ev.target.textContent)[0][0]);
     }
-    
+
+    console.log(process.env.REACT_APP_API_DNS)
+    console.log(process.env)
     return <div className="bg-dark d-flex flex-column align-items-center h-100">
         <Header />
         {Object.keys(quesionnaries).map((type, i) => {
             if (types === "") { return <div className={`${type} w-50 h-25 bg-warning text-dark m-2 d-flex justify-content-center align-items-center`} key={`type-${i}`} onClick={handleType}><h1>{typeDict[type]}</h1></div> }
             else {
-                if ( type === types) {
+                if (type === types) {
                     var names = quesionnaries[types].map((name, j) => {
                         return <div className={`name${name} w-50 h-25 bg-warning text-dark m-2 d-flex justify-content-center align-items-center`} key={`type-${types}-name-${j}`} onClick={() => quizChoice(quiz.filter(q => q.name.toUpperCase() === `${name}_${types}`.toUpperCase())[0])}>{contientDict[name.toLowerCase()].toUpperCase()}</div>
                     })
                     return <>
                         {names}
-                        <button  type="button" className="mb-2 btn btn-secondary" onClick={() => setTypes("")}>↩</button>
+                        <button type="button" className="mb-2 btn btn-secondary" onClick={() => setTypes("")}>↩</button>
                     </>
                 }
             }

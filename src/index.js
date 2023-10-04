@@ -15,7 +15,7 @@ root.render(
 
 document.getElementById('root').classList.toggle('vh-100')
 document.getElementById('root').classList.toggle('vw-100')
-document.getElementById('root').classList.toggle('bg-dark')
+document.getElementById('root').classList.toggle('bg-success')
 document.getElementById('root').classList.toggle('text-light')
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -2,13 +2,14 @@
     "name": "webigeofront",
     "version": "0.1.0",
     "private": true,
-    "homepage": "http://DcPepper.github.io/WEBIGEO_FRONT",
+    "homepage": "",
     "dependencies": {
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
         "@testing-library/user-event": "^13.5.0",
         "axios": "^1.4.0",
         "file-loader": "^6.2.0",
+        "n": "^9.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.11.0",
@@ -19,10 +20,10 @@
     },
     "scripts": {
         "start": "react-scripts start --host 0.0.0.0",
-        "predeploy" : "npm run build",
-        "deploy" : "gh-pages -d build",
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d build",
         "build": "react-scripts build",
-        "test": "react-scripts test",
+        "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!my-library-dir)/'",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {

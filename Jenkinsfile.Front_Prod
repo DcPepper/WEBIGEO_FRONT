@@ -1,0 +1,112 @@
+pipeline {
+    environment {
+        DOCKER_ID = "webigeo"
+        DOCKER_IMAGE= "my-react"
+        DOCKER_TAG = "latest"
+        KUBECONFIG = credentials("config")
+    }
+    agent {
+        label 'Front_End'
+    }
+    stages{
+        /*/
+        stage('Checkout Dev Branch') {
+            steps {
+                // Checkout the dev branch
+                script {
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: 'dev']], 
+                        doGenerateSubmoduleConfigurations: false, 
+                        extensions: [], 
+                        submoduleCfg: [], 
+                        userRemoteConfigs: [[url: 'https://github.com/WEBIGEO-ALTEN/WEBIGEO_FRONT.git']]
+                    ])
+                }
+            }
+        }
+        
+        stage('Merge Dev into Main') {
+            steps {
+                script{
+                // Navigate to the local main branch
+                    sh 'git checkout main'
+                    //def mergeResult = sh(script: 'git merge origin/dev', returnStatus: true)
+                
+                    withCredentials([gitUsernamePassword(credentialsId: 'vincTokenGit',
+                    gitToolName: 'git-tool')]) {
+                        //sh 'git checkout main'
+                        //sh 'git checkout dev'
+                        //sh 'git checkout main'
+                        //sh 'git branch'
+                        sh 'git merge origin/dev'
+                    sh 'git push https://kuji777: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@github.com/WEBIGEO-ALTEN/WEBIGEO_FRONT.git main'
+                }
+                }
+            }
+        }
+        
+        /*/
+        stage("Clean the containers"){
+            steps{
+                script{
+                    def container = sh(script: 'docker ps',returnStdout: true).trim()
+                    echo "This is the output : ${container}"
+                    /*/
+                    if (container.contains(env.DOCKER_FRONT)){
+                        sh "docker stop $DOCKER_FRONT || true"
+                        sh "docker rm $DOCKER_FRONT || true"
+                        sh "docker rmi DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG || true"
+                    }
+                    else{
+                        echo "The container is clean"
+                    }
+                    /*/
+                }
+            }
+        }
+        
+        stage("Front End image") {
+            steps {
+                script {
+                    //sh "docker stop $DOCKER_FRONT"
+                    //sh "docker rm $DOCKER_FRONT"
+                    echo "Building Docker image: $DOCKER_IMAGE:$DOCKER_TAG"
+                    sh "docker build -t webigeo/my-react:latest . --build-arg BRANCH=main"
+                }
+            }
+        }
+        
+        stage('Pushing Back End image to DockerHub') {
+            environment
+            {
+                DOCKER_HUB_TOKEN = credentials("DOCKER_HUB_TOKEN") 
+            }
+
+            steps {
+
+                script {
+                    //env.DOCKER_HUB_TOKEN = DOCKER_HUB_TOKEN
+                    sh '''
+                    echo "docker login -u $DOCKER_ID -p $DOCKER_HUB_TOKEN"
+                    docker login -u "webigeo" -p "yP?5Q>Ktp+YA%#_"
+                    sleep 10
+                    docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                    '''
+                }
+            }
+        }
+        
+        stage('CD Deployment webigeo Front in prod') {
+            steps {
+                script {
+                    //git url: "https://github.com/WEBIGEO-ALTEN/WEBIGEO/", branch: 'master'
+                    sh """
+                    helm upgrade kubweb1 webigeo_front/ --values=webigeo_front/values-prod.yaml -n prod || helm install kubweb1 webigeo_front/ --values=webigeo_front/values-prod.yaml -n prod --create-namespace
+                    """
+                }
+            }
+        }
+        
+        
+    }
+}
